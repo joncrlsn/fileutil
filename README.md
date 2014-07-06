@@ -42,8 +42,4 @@ func Exists(path string) (bool, error) {
 ```
 // Generates a temporary file path for use in testing or whatever
 func TempFileName(prefix, suffix string) string {
-    randBytes := make([]byte, 16)
-    rand.Read(randBytes)
-    return filepath.Join(os.TempDir(), prefix + hex.EncodeToString(randBytes) + suffix)
-}
 ```
