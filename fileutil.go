@@ -11,17 +11,17 @@ import (
 )
 
 /*
- * Reads a file line by line into a channel
+ * Reads a text file line by line into a channel.
  *
- * c := readLinesChannel(fileName)
+ * c := fileutil.ReadLinesChannel(fileName)
  * for line := range c {
  *   fmt.Printf("  Line: %s\n", line)
  * }
  */
-func ReadLinesChannel(fileName string) <-chan string {
+func ReadLinesChannel(filePath string) <-chan string {
     c := make(chan string)
-    file, err := os.Open(fileName)
-    if err !=nil {
+    file, err := os.Open(filePath)
+    if err != nil {
         log.Panic(err)
     }
     go func() {
@@ -37,9 +37,10 @@ func ReadLinesChannel(fileName string) <-chan string {
 
 
 /*
- * Reads a file line by line into an array
+ * Reads a text file line by line into an array.  Not recommended
+ * for use with large files.
  *
- *  lines, err := readLinesArray(fileName)
+ *  lines, err := fileutil.ReadLinesArray(filePath)
  *  if err != nil {
  *      log.Fatalf("readLines: %s\n", err)
  *  }
@@ -53,7 +54,6 @@ func ReadLinesArray(path string) ([]string, error) {
         return nil, err
     }
     defer file.Close()
-
 
     var lines []string
     scanner := bufio.NewScanner(file)
