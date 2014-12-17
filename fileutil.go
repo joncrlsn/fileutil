@@ -1,3 +1,5 @@
+// Package fileutil provides functions for doing things with files, like reading them
+// line by line, etc
 package fileutil
 
 import (
@@ -5,23 +7,27 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 )
 
 // ReadLinesChannel reads a text file line by line into a channel.
 //
-// c := fileutil.ReadLinesChannel(fileName)
-// for line := range c {
-//   fmt.Printf("  Line: %s\n", line)
-// }
+//   c, err := fileutil.ReadLinesChannel(fileName)
+//   if err != nil {
+//      log.Fatalf("readLines: %s\n", err)
+//   }
+//   for line := range c {
+//      fmt.Printf("  Line: %s\n", line)
+//   }
 //
-func ReadLinesChannel(filePath string) <-chan string {
+// nil is returned (with the error) if there is an error opening the file
+//
+func ReadLinesChannel(filePath string) (<-chan string, error) {
 	c := make(chan string)
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Panic(err)
+        return nil, err
 	}
 	go func() {
 		defer file.Close()
@@ -31,19 +37,21 @@ func ReadLinesChannel(filePath string) <-chan string {
 		}
 		close(c)
 	}()
-	return c
+	return c, nil
 }
 
 // ReadLinesArray reads a text file line by line into an array.  Not recommended
 // for use with large files.
 //
-//  lines, err := fileutil.ReadLinesArray(filePath)
-//  if err != nil {
-//      log.Fatalf("readLines: %s\n", err)
-//  }
-//  for i, line := range lines {
-//      fmt.Printf("  Line: %d %s\n", i, line)
-//  }
+//   lines, err := fileutil.ReadLinesArray(filePath)
+//   if err != nil {
+//       log.Fatalf("readLines: %s\n", err)
+//   }
+//   for i, line := range lines {
+//       fmt.Printf("  Line: %d %s\n", i, line)
+//   }
+//
+// nil is returned if there is an error opening the file
 //
 func ReadLinesArray(path string) ([]string, error) {
 	file, err := os.Open(path)
