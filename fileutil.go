@@ -27,7 +27,7 @@ func ReadLinesChannel(filePath string) (<-chan string, error) {
 	c := make(chan string)
 	file, err := os.Open(filePath)
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 	go func() {
 		defer file.Close()
@@ -40,10 +40,10 @@ func ReadLinesChannel(filePath string) (<-chan string, error) {
 	return c, nil
 }
 
-// ReadLinesArray reads a text file line by line into an array.  Not recommended
-// for use with large files.
+// ReadLinesSlice reads a text file line by line into a slice of strings.
+// Not recommended for use with very large files due to the memory needed.
 //
-//   lines, err := fileutil.ReadLinesArray(filePath)
+//   lines, err := fileutil.ReadLinesSlice(filePath)
 //   if err != nil {
 //       log.Fatalf("readLines: %s\n", err)
 //   }
@@ -53,7 +53,7 @@ func ReadLinesChannel(filePath string) (<-chan string, error) {
 //
 // nil is returned if there is an error opening the file
 //
-func ReadLinesArray(path string) ([]string, error) {
+func ReadLinesSlice(path string) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -68,8 +68,8 @@ func ReadLinesArray(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
-// WriteLinesArray writes the lines to the given file.
-func WriteLinesArray(lines []string, path string) error {
+// WriteLinesSlice writes the given slice of lines to the given file.
+func WriteLinesSlice(lines []string, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
