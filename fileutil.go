@@ -9,7 +9,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
+
+var propertySplittingRegex = regexp.MustCompile(`\s*=\s*`)
 
 // ReadLinesChannel reads a text file line by line into a channel.
 //
@@ -100,4 +104,37 @@ func TempFileName(prefix, suffix string) string {
 	randBytes := make([]byte, 16)
 	rand.Read(randBytes)
 	return filepath.Join(os.TempDir(), prefix+hex.EncodeToString(randBytes)+suffix)
+}
+
+type Property struct {
+	Name  string
+	Value string
+}
+
+// Reads name-value pairs in a properties file
+func ReadPropertiesFile(fileName string) ([]Property, error) {
+	c, err := ReadLinesChannel(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	properties := []Property{}
+	for line := range c {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "#") {
+			// Ignore this line
+		} else if len(line) == 0 {
+			// Ignore this line
+		} else {
+			parts := propertySplittingRegex.Split(line, 2)
+			properties = append(properties, Property{Name: parts[0], Value: parts[1]})
+		}
+	}
+
+	return properties, nil
+}
+
+// Pwd returns the present working directory
+func Pwd() (string, error) {
+	return filepath.Abs(filepath.Dir(os.Args[0]))
 }
