@@ -3,7 +3,7 @@
 package fileutil
 
 import (
-	"fmt"
+	//	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -12,9 +12,9 @@ import (
 // Test_ReadPropertiesFile creates a test properties file and reads it into memory
 func Test_ReadPropertiesFile(t *testing.T) {
 
-    //
-    // Create the test properties file
-    //
+	//
+	// Create the test properties file
+	//
 	filename := "test.properties"
 	file, err := os.Create(filename)
 	if err != nil {
@@ -31,22 +31,24 @@ error.message = There was an error
 	}
 	file.Close()
 
-    //
-    // Read the properties from the file
-    //
-    var properties []Property
+	//
+	// Read the properties from the file
+	//
+	var properties map[string]string
+	var ok bool
+	var value string
 	properties, err = ReadPropertiesFile("test.properties")
 	if err != nil {
 		t.Fatal("Error reading test properties file", err)
 	}
-	if properties[0].Name != "maxRows" {
+	if _, ok = properties["maxRows"]; !ok {
 		t.Fail()
 	}
-	if properties[2].Name != "error.message" {
+	if _, ok = properties["error.message"]; !ok {
 		t.Fail()
 	}
-	if properties[2].Value != "There was an error" {
-        t.Fatalf("value is wrong for error.message: '%s'", properties[2].Value)
+	if value, ok = properties["error.message"]; !ok || value != "There was an error" {
+		t.Fatalf("value is wrong for error.message: '%s'", properties["error.message"])
 	}
 
 }

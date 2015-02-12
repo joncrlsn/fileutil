@@ -106,19 +106,15 @@ func TempFileName(prefix, suffix string) string {
 	return filepath.Join(os.TempDir(), prefix+hex.EncodeToString(randBytes)+suffix)
 }
 
-type Property struct {
-	Name  string
-	Value string
-}
-
-// Reads name-value pairs in a properties file
-func ReadPropertiesFile(fileName string) ([]Property, error) {
+// Reads name-value pairs from a properties file
+// Property file has lines in the format of "name = value" (leading and trailing spaces are ignored)
+func ReadPropertiesFile(fileName string) (map[string]string, error) {
 	c, err := ReadLinesChannel(fileName)
 	if err != nil {
 		return nil, err
 	}
 
-	properties := []Property{}
+	properties := make(map[string]string)
 	for line := range c {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "#") {
@@ -127,7 +123,7 @@ func ReadPropertiesFile(fileName string) ([]Property, error) {
 			// Ignore this line
 		} else {
 			parts := propertySplittingRegex.Split(line, 2)
-			properties = append(properties, Property{Name: parts[0], Value: parts[1]})
+			properties[parts[0]] = parts[1]
 		}
 	}
 
